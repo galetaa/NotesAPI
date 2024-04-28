@@ -1,0 +1,189 @@
+openapi: 3.0.0
+info:
+  title: Notes API
+  version: '1'
+servers:
+  - url: http://localhost:5000/
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Invalid input data
+        '500':
+          description: Internal server error
+  /login:
+    post:
+      summary: Authenticate a user and retrieve a token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '400':
+          description: Invalid username or password
+        '500':
+          description: Internal server error
+  /create_note:
+    post:
+      summary: Create a new note
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                text:
+                  type: string
+              required:
+                - title
+                - text
+      responses:
+        '201':
+          description: Note created successfully
+        '400':
+          description: Invalid input data
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+  /edit_note:
+    post:
+      summary: Edit an existing note
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note_id:
+                  type: integer
+                new_title:
+                  type: string
+                new_text:
+                  type: string
+              required:
+                - note_id
+      responses:
+        '201':
+          description: Note updated successfully
+        '400':
+          description: Invalid input data
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+  /delete_note:
+    post:
+      summary: Delete a note
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note_id:
+                  type: integer
+              required:
+                - note_id
+      responses:
+        '201':
+          description: Note deleted successfully
+        '400':
+          description: Invalid input data
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+  /show_notes:
+    post:
+      summary: Retrieve a list of notes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                page:
+                  type: integer
+                per_page:
+                  type: integer
+                start_date:
+                  type: string
+                  format: date
+                end_date:
+                  type: string
+                  format: date
+                user_id:
+                  type: integer
+              required:
+                - page
+                - per_page
+      responses:
+        '201':
+          description: Notes retrieved successfully
+        '400':
+          description: Invalid input data
+        '500':
+          description: Internal server error
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

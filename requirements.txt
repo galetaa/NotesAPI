@@ -1,0 +1,4 @@
+PyJWT~=2.8.0
+werkzeug~=3.0.2
+SQLAlchemy~=2.0.29
+flask~=3.0.3
