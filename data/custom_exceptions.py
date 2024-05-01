@@ -63,6 +63,20 @@ class InvalidTitleError(ValidationError):
         super().__init__(message, status_code)
 
 
+class InvalidUserID(ValidationError):
+    """Exception raised for invalid userid."""
+
+    def __init__(self, message="User ID is invalid.", status_code=400):
+        super().__init__(message, status_code)
+
+
+class InvalidNoteID(ValidationError):
+    """Exception raised for invalid noteid."""
+
+    def __init__(self, message="Note ID is invalid.", status_code=400):
+        super().__init__(message, status_code)
+
+
 class IncorrectPasswordError(ValidationError):
     """Exception raised for incorrect password."""
 
@@ -110,4 +124,3 @@ class ThereIsNoData(ValidationError):
 
     def __init__(self, message="there is no any data to get.", status_code=400):
         super().__init__(message, status_code)
-

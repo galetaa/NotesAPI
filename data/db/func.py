@@ -37,6 +37,12 @@ def login_user(session, username, password):
     if (username is None) or (password is None):
         raise NoneCredentialsError()
 
+    if not is_username_correct(username):
+        raise InvalidUsernameError("Username is invalid")
+
+    if not is_password_correct(password):
+        raise InvalidPasswordError("Password is invalid")
+
     if not is_user_exists(session, username):
         raise UserDoesNotExistsError()
 
@@ -60,11 +66,11 @@ def create_note(session, user_id, title, text):
     if (not title) or (not text):
         raise NoneNoteParamsError()
 
-    if len(title) > MAX_TITLE_LENGTH:
-        raise InvalidTitleError("Title is too long.")
+    if not is_title_correct(title):
+        raise InvalidTitleError()
 
-    if len(text) > MAX_TEXT_LENGTH:
-        raise InvalidTextError("Text is too long.")
+    if not is_text_correct(text):
+        raise InvalidTextError()
 
     new_note = Note(user_id=user_id, title=title, text=text)
     session.add(new_note)
@@ -80,6 +86,15 @@ def create_note(session, user_id, title, text):
 
 
 def edit_note(session, note_id, title, text, token):
+    if not is_note_id_correct(note_id):
+        raise InvalidNoteID()
+
+    if not is_title_correct(title):
+        raise InvalidTitleError()
+
+    if not is_text_correct(text):
+        raise InvalidTextError()
+
     note = session.query(Note).filter(Note.id == note_id).first()
 
     if not note:
@@ -121,6 +136,9 @@ def edit_note(session, note_id, title, text, token):
 
 
 def delete_note(session, note_id, token):
+    if not is_note_id_correct(note_id):
+        raise InvalidNoteID()
+
     note = session.query(Note).filter(Note.id == note_id).first()
 
     if not note:
@@ -152,7 +170,7 @@ def show_notes(session, start_date, end_date, page, per_page, user_id, token):
     conditions = []
 
     if page < 1 or per_page < 1:
-        raise InvalidPageParamsError
+        raise InvalidPageParamsError()
 
     start_index = (page - 1) * per_page
 
@@ -215,7 +233,30 @@ def is_password_matched(session, username, password):
     return user.id
 
 
+def is_note_id_correct(note_id):
+    if not (note_id is None):
+        if not (type(note_id) is int):
+            return False
+    return True
+
+
+def is_title_correct(title):
+    if not (title is None):
+        if (type(title) is not str) or (len(title) > MAX_TITLE_LENGTH) or (len(title) < MIN_TITLE_LENGTH):
+            return False
+    return True
+
+
+def is_text_correct(text):
+    if not (text is None):
+        if (type(text) is not str) or (len(text) > MAX_TEXT_LENGTH) or (len(text) < MIN_TEXT_LENGTH):
+            return False
+    return True
+
+
 def is_username_correct(username):
+    if type(username) != str:
+        return False
     if not username:
         return False
     if (len(username) < MIN_PASSWORD_LENGTH) or (len(username) > MAX_PASSWORD_LENGTH):
@@ -227,6 +268,8 @@ def is_username_correct(username):
 
 def is_password_correct(password):
     if not password:
+        return False
+    if type(password) != str:
         return False
     if len(password) < MIN_PASSWORD_LENGTH:
         return False
@@ -242,5 +285,7 @@ def is_password_correct(password):
 
 
 def is_valid_date_format(date_string):
+    if type(date_string) is not str:
+        return False
     pattern = r'^\d{4}\.\d{2}\.\d{2}$'
     return bool(re.match(pattern, date_string))
